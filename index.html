@@ -1,17 +1,17 @@
 ---
-layout: default
+layout: home
 title: 전혁건의 블로그
 ---
 
-안녕하세요!  
-이곳은 전혁건의 개발 공부 기록과 일상들을 담은 블로그입니다.
+<h1>전혁건의 블로그</h1>
 
-글 목록은 상단에서 확인할 수 있습니다.
+<nav>
+  <a href="/">홈</a> |
+  <a href="/about">소개</a> |
+  <a href="/projects">프로젝트</a>
+</nav>
 
-<ul>
-  {% for post in site.posts %}
-    <li>
-      <a href="{{ post.url }}">{{ post.title }}</a> - {{ post.date | date: "%Y-%m-%d" }}
-    </li>
-  {% endfor %}
-</ul>
+<hr>
+
+<p>블로그에 오신 걸 환영합니다. 아래는 글 목록입니다.</p>
+
