@@ -1,10 +1,6 @@
 title: 전혁건의 블로그
-description: 개발 공부와 기록을 공유하는 공간입니다.
-show_downloads: false
+description: 개발 공부 기록과 프로젝트 공유
 theme: minima
 
-nav:
-  - title: 홈
-    url: /
-  - title: 소개
-    url: /about
+plugins:
+  - jekyll-feed
