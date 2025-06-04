@@ -2,3 +2,9 @@ title: 전혁건의 블로그
 description: 개발 공부와 기록을 공유하는 공간입니다.
 show_downloads: false
 theme: jekyll-theme-cayman
+
+nav:
+  - title: 홈
+    url: /
+  - title: 소개
+    url: /about
