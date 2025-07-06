@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "블로그 첫 글 - 시작하기"
+title: "First"
 date: 2025-06-05
 ---
 
