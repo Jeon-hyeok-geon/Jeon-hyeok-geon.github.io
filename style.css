@@ -246,7 +246,7 @@ h2 em {
 
 .panel-display {
   position: relative;
-  height: 254px;
+  height: 410px;
   overflow: hidden;
 }
 
@@ -502,7 +502,7 @@ h2 em {
 
   .signal-panel { min-height: 385px; }
 
-  .panel-display { height: 215px; }
+  .panel-display { height: 330px; }
 
   .keyword-grid { grid-template-columns: repeat(2, 1fr); }
 
