@@ -48,6 +48,11 @@ a { color: inherit; }
   margin: 0 auto;
 }
 
+body > .site-header {
+  width: min(100% - 48px, 1200px);
+  margin: 0 auto;
+}
+
 .site-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -537,11 +542,6 @@ h1 em {
   padding: 92px 0 130px;
 }
 
-.page-article .site-header {
-  width: min(100% - 48px, 1200px);
-  margin: 0 auto;
-}
-
 .article-header {
   max-width: 750px;
   margin: 0 auto 72px;
@@ -642,7 +642,9 @@ h1 em {
 }
 
 @media (max-width: 560px) {
-  .site-shell { width: min(100% - 30px, 1200px); }
+  .site-shell,
+  body > .site-header { width: min(100% - 30px, 1200px); }
+
   .header-link { font-size: 0.66rem; }
   .hero-actions { display: grid; }
   .button { justify-content: space-between; }
