@@ -3,69 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hyeokgeon Jeon — Software Engineering student exploring AI systems, data analysis, and storage I/O.">
-  <title>Hyeokgeon Jeon | Portfolio</title>
+  <meta name="description" content="Hyeokgeon Jeon — systems portfolio on AI workloads, data analysis, and storage I/O.">
+  <title>Hyeokgeon Jeon — Systems Portfolio</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="page">
-    <header class="nav">
-      <a class="brand" href="/">Hyeokgeon Jeon</a>
-      <nav class="nav-links" aria-label="External links">
-        <a href="https://github.com/Jeon-hyeok-geon" target="_blank" rel="noreferrer">GitHub</a>
-        <a href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">LinkedIn</a>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="wordmark" href="./">HJ<span>/</span>SYS</a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a class="is-active" href="./">Home</a>
+        <a href="about.html">About</a>
+        <a href="#work">Work</a>
+        <a href="#notes">Notes</a>
       </nav>
+      <a class="header-link" href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a>
     </header>
 
-    <section class="hero" aria-labelledby="intro-title">
-      <p class="eyebrow">Software Engineering Student</p>
-      <h1 id="intro-title">AI systems, data analysis, and storage I/O.</h1>
-      <p class="hero-copy">
-        I explore how AI workloads interact with systems, then turn questions into reproducible experiments.
-        My current work connects coding-agent tool execution, data analysis, and storage-aware measurement.
-      </p>
-      <div class="actions">
-        <a class="button" href="#selected-work">Selected work</a>
-        <a class="button secondary" href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">Connect on LinkedIn</a>
-      </div>
-    </section>
-
-    <section class="work" id="selected-work" aria-labelledby="work-title">
-      <div class="section-heading">
-        <h2 id="work-title">Selected work</h2>
-        <p>Research in progress and team project experience.</p>
-      </div>
-
-      <div class="cards">
-        <article class="card">
-          <p class="card-label">Ongoing personal research</p>
-          <h3>Code Agent Workload Analysis</h3>
-          <p>
-            Exploring how repository exploration, code edits, and test execution by coding agents
-            create storage I/O workloads. The current focus is building a reproducible measurement workflow.
+    <main>
+      <section class="hero section-grid" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="section-kicker"><span class="signal-dot"></span> SOFTWARE ENGINEERING · SOUTH KOREA</p>
+          <h1 id="hero-title">AI workloads,<br><em>measured</em> at the<br>system boundary.</h1>
+          <p class="hero-lede">
+            I am Hyeokgeon Jeon, a software engineering student exploring how AI workloads,
+            data, and storage systems interact. I turn research questions into reproducible
+            measurement workflows.
           </p>
-        </article>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#work">Explore selected work <span>↓</span></a>
+            <a class="button button-quiet" href="about.html">About my approach <span>→</span></a>
+          </div>
+        </div>
 
-        <article class="card">
-          <p class="card-label">2026 · Four-person team project</p>
-          <h3>Turbofan Predictive Maintenance</h3>
+        <aside class="signal-panel" aria-label="Research focus panel">
+          <div class="panel-topline">
+            <span>SYSTEM TRACE / 01</span>
+            <span class="panel-live">ACTIVE</span>
+          </div>
+          <div class="panel-display" aria-hidden="true">
+            <div class="scan-line"></div>
+            <span class="coordinate coordinate-a">AGENT</span>
+            <span class="coordinate coordinate-b">I/O</span>
+            <span class="coordinate coordinate-c">NVMe</span>
+            <div class="signal-path">
+              <i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+          <div class="panel-readout">
+            <div><span>FOCUS</span><strong>AI SYSTEMS</strong></div>
+            <div><span>METHOD</span><strong>MEASURE → VERIFY</strong></div>
+            <div><span>STATUS</span><strong>RESEARCH IN PROGRESS</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="focus-band" aria-label="Research focus">
+        <div><span>01</span><p>Agent<br>Workloads</p></div>
+        <div><span>02</span><p>Data &amp;<br>Reliability</p></div>
+        <div><span>03</span><p>Storage<br>Systems</p></div>
+      </section>
+
+      <section class="section section-grid" id="work" aria-labelledby="work-title">
+        <div class="section-intro">
+          <p class="section-kicker">SELECTED WORK</p>
+          <h2 id="work-title">Questions before<br>claims.</h2>
           <p>
-            A predict-then-optimize project using NASA C-MAPSS data for RUL prediction and maintenance scheduling.
-            I contributed to the ML analysis with a focus on EDA and preprocessing, presentation materials, and English presentation.
+            Each project records its scope, my role, and its current evidence level.
+            Team outcomes and ongoing research remain clearly separated.
           </p>
-          <a class="text-link" href="https://github.com/kimyhleo-hub/turbofan-predictive-maintenance" target="_blank" rel="noreferrer">View team repository ↗</a>
-        </article>
+        </div>
+
+        <div class="work-list">
+          <article class="work-card work-card-featured">
+            <div class="card-meta">
+              <span>01 / ONGOING PERSONAL RESEARCH</span>
+              <span class="status-pill">IN PROGRESS</span>
+            </div>
+            <h3>Code Agent<br>Workload Analysis</h3>
+            <p>
+              Exploring how coding agents turn repository exploration, edits, and tests
+              into storage I/O workloads. The present goal is a reproducible measurement
+              workflow across syscall, process, and device layers.
+            </p>
+            <a class="arrow-link" href="posts/code-agent-io-workload.html">Read research note <span>→</span></a>
+          </article>
+
+          <article class="work-card">
+            <div class="card-meta">
+              <span>02 / 2026 FOUR-PERSON TEAM PROJECT</span>
+              <span class="status-pill status-outline">TEAM WORK</span>
+            </div>
+            <h3>Turbofan<br>Predictive Maintenance</h3>
+            <p>
+              A NASA C-MAPSS predict-then-optimize project for remaining useful life prediction
+              and resource-constrained maintenance scheduling. I worked on ML analysis with a
+              focus on EDA and preprocessing, presentation materials, and English presentation.
+            </p>
+            <a class="arrow-link" href="https://github.com/kimyhleo-hub/turbofan-predictive-maintenance" target="_blank" rel="noreferrer">View team repository <span>↗</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section note-section" id="notes" aria-labelledby="notes-title">
+        <div class="section-heading">
+          <p class="section-kicker">RESEARCH NOTES</p>
+          <h2 id="notes-title">Working in public,<br>carefully.</h2>
+        </div>
+        <a class="note-card" href="posts/code-agent-io-workload.html">
+          <span class="note-index">NOTE / 001</span>
+          <div>
+            <h3>Measuring tool-execution I/O in coding agents</h3>
+            <p>
+              A first note on the research question, measurement boundary, and what has not yet been claimed.
+            </p>
+          </div>
+          <span class="note-arrow">→</span>
+        </a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2026 Hyeokgeon Jeon</p>
+      <div>
+        <a href="https://github.com/Jeon-hyeok-geon" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">LinkedIn</a>
       </div>
-
-      <p class="note">
-        Team project outcomes are presented as team results. Ongoing research is described as work in progress,
-        without claiming unpublished experimental results.
-      </p>
-    </section>
-
-    <footer class="footer">
-      © 2026 Hyeokgeon Jeon · <a href="https://github.com/Jeon-hyeok-geon">GitHub</a> · <a href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/">LinkedIn</a>
     </footer>
-  </main>
+  </div>
 </body>
 </html>
