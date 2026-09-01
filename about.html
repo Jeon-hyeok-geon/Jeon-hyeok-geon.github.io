@@ -1,15 +1,63 @@
-<!DOCTYPE html>
-<html lang="ko">
+<!doctype html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>About</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About Hyeokgeon Jeon.">
+  <title>About — Hyeokgeon Jeon</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>About Me</h1>
-  <p>안녕하세요. 저는 소프트웨어공학과 학생입니다.</p>
+  <header class="site-header">
+    <a class="wordmark" href="./">HJ<span>/</span>SYS</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="./">Home</a>
+      <a class="is-active" href="about.html">About</a>
+      <a href="index.html#work">Work</a>
+      <a href="index.html#notes">Notes</a>
+    </nav>
+    <a class="header-link" href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a>
+  </header>
 
-  <a href="index.html">홈으로 돌아가기</a>
+  <main class="page-article">
+    <header class="article-header">
+      <p class="section-kicker"><span class="signal-dot"></span> ABOUT</p>
+      <h1>Build slowly.<br><em>Verify</em> carefully.</h1>
+      <p class="article-summary">
+        I am a software engineering student interested in the boundary between AI workloads,
+        data analysis, and storage systems.
+      </p>
+    </header>
+
+    <article class="article-body">
+      <h2>Current direction</h2>
+      <p>
+        My current personal research explores the system-side workload created when coding agents
+        inspect repositories, modify code, and run tests. I am especially interested in how those
+        tool-execution paths appear across process, filesystem, and storage-device measurements.
+      </p>
+
+      <h2>How I present work</h2>
+      <p>
+        I separate a question from a conclusion, ongoing work from finished work, and a team outcome
+        from my own contribution. This portfolio is intended to show the evidence and limits behind
+        each project, not to make a list of unverified claims.
+      </p>
+
+      <h2>Areas of interest</h2>
+      <ul>
+        <li>AI systems and agent workloads</li>
+        <li>Data analysis and predictive maintenance</li>
+        <li>Storage I/O, system measurement, and reliability</li>
+      </ul>
+
+      <p class="fact-box">
+        <span class="section-kicker">CONTACT</span>
+        <a class="arrow-link" href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">Connect on LinkedIn <span>↗</span></a>
+      </p>
+
+      <a class="back-link" href="./">← Back to home</a>
+    </article>
+  </main>
 </body>
 </html>
-
-<link rel="stylesheet" href="style.css">
