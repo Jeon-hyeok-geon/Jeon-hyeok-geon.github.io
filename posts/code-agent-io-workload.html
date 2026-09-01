@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Research Note 001: Measuring tool-execution I/O in coding agents.">
+  <title>Research Note 001 — Hyeokgeon Jeon</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="../">HJ<span>/</span>SYS</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="../">Home</a>
+      <a href="../about.html">About</a>
+      <a href="../index.html#work">Work</a>
+      <a class="is-active" href="../index.html#notes">Notes</a>
+    </nav>
+    <a class="header-link" href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a>
+  </header>
+
+  <main class="page-article">
+    <header class="article-header">
+      <p class="section-kicker"><span class="signal-dot"></span> RESEARCH NOTE / 001</p>
+      <h1>Measuring tool-execution I/O in coding agents.</h1>
+      <p class="article-summary">
+        A first note on the question, measurement boundary, and evidence level for an ongoing
+        personal research project.
+      </p>
+      <div class="article-meta">
+        <span>SEPTEMBER 2026</span>
+        <span>STATUS: IN PROGRESS</span>
+        <span>TOPIC: AI SYSTEMS / STORAGE I/O</span>
+      </div>
+    </header>
+
+    <article class="article-body">
+      <h2>The question</h2>
+      <p>
+        Coding agents do more than generate text. They search repositories, read files, apply edits,
+        build code, and run tests. This research asks how those tool-execution paths create I/O at
+        the filesystem and storage-device boundary.
+      </p>
+
+      <h2>What I am trying to observe</h2>
+      <ul>
+        <li>Repository exploration and file-read behavior</li>
+        <li>Code edits and the resulting write activity</li>
+        <li>Test and build execution as part of an agent trajectory</li>
+        <li>Differences between process-level and device-level measurements</li>
+      </ul>
+
+      <h2>Current measurement direction</h2>
+      <p>
+        The current workflow brings together syscall traces, process-level measurements, and device
+        counters. Cache state, execution environment, and repeated runs are recorded so that a later
+        comparison can distinguish the workload from avoidable measurement noise.
+      </p>
+
+      <div class="fact-box">
+        <p class="section-kicker">EVIDENCE LEVEL</p>
+        <p>
+          The measurement workflow and a cold-versus-warm read pilot have been prepared. A full
+          coding-agent comparison and general performance conclusions are not yet claimed.
+        </p>
+      </div>
+
+      <h2>What this note does not claim</h2>
+      <p>
+        This is not a published paper, a benchmark result, or a completed performance study. It is a
+        transparent record of an early research direction and the method being prepared to test it.
+      </p>
+
+      <a class="back-link" href="../">← Back to home</a>
+    </article>
+  </main>
+</body>
+</html>
