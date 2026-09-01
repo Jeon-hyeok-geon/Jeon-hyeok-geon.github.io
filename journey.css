@@ -604,3 +604,250 @@ body.journey-body::before {
 
   .journey-footer div { margin-top: 14px; }
 }
+
+
+/* Editorial year-chapter timeline */
+.chapter-timeline {
+  position: relative;
+  border-top: 1px solid var(--j-line);
+}
+
+.year-chapter {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  position: relative;
+  padding: 29px 0 118px;
+}
+
+.year-chapter:last-child { padding-bottom: 18px; }
+
+.year-anchor {
+  position: sticky;
+  top: 28px;
+  align-self: start;
+  padding: 4px 42px 0 0;
+}
+
+.year-number {
+  margin: 0 0 12px;
+  color: var(--j-text);
+  font-family: var(--j-mono);
+  font-size: clamp(3.15rem, 5.6vw, 5.7rem);
+  font-weight: 600;
+  letter-spacing: -0.1em;
+  line-height: 0.82;
+}
+
+.year-number span {
+  color: var(--j-accent);
+  font-size: 0.47em;
+  letter-spacing: -0.06em;
+}
+
+.year-meta {
+  margin: 0;
+  color: var(--j-dim);
+  font-family: var(--j-mono);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.year-records {
+  position: relative;
+  padding: 0 0 0 51px;
+  border-left: 1px solid rgba(154, 247, 195, 0.42);
+}
+
+.year-chapter:not(:last-child) .year-records::after {
+  position: absolute;
+  bottom: -118px;
+  left: -1px;
+  width: 1px;
+  height: 118px;
+  background: rgba(154, 247, 195, 0.42);
+  content: "";
+}
+
+.year-record {
+  position: relative;
+  padding: 0 0 57px;
+}
+
+.year-record:last-child { padding-bottom: 0; }
+
+.year-record::before {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  left: -57px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--j-accent);
+  border-radius: 50%;
+  background: var(--j-bg);
+  box-shadow: 0 0 0 5px var(--j-bg);
+  content: "";
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.year-record::after {
+  position: absolute;
+  top: 10px;
+  left: -51px;
+  width: 51px;
+  height: 1px;
+  background: rgba(154, 247, 195, 0.42);
+  content: "";
+  transition: width 180ms ease, background 180ms ease;
+}
+
+.record-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0 0 13px;
+  color: var(--j-dim);
+  font-family: var(--j-mono);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.085em;
+}
+
+.record-meta span {
+  min-width: 22px;
+  color: var(--j-accent);
+}
+
+.year-record h3 {
+  max-width: 720px;
+  margin: 0 0 9px;
+  color: var(--j-text);
+  font-size: clamp(1.38rem, 2.25vw, 1.92rem);
+  font-weight: 620;
+  letter-spacing: -0.055em;
+  line-height: 1.1;
+  word-break: keep-all;
+  transition: color 180ms ease;
+}
+
+.year-record > p:last-child {
+  max-width: 660px;
+  margin: 0;
+  color: var(--j-muted);
+  font-size: 0.91rem;
+  line-height: 1.68;
+  word-break: keep-all;
+  transition: color 180ms ease;
+}
+
+.year-record:hover::before {
+  background: var(--j-accent);
+  box-shadow: 0 0 0 5px var(--j-bg), 0 0 18px rgba(154, 247, 195, 0.22);
+}
+
+.year-record:hover::after {
+  width: 68px;
+  background: var(--j-accent);
+}
+
+.year-record:hover h3 { color: var(--j-accent); }
+.year-record:hover > p:last-child { color: var(--j-text); }
+
+.year-chapter.is-now .year-records::after {
+  position: absolute;
+  bottom: -76px;
+  left: -1px;
+  width: 1px;
+  height: 76px;
+  background: linear-gradient(to bottom, rgba(154, 247, 195, 0.42), transparent);
+  content: "";
+}
+
+.year-chapter.is-now .year-record::before {
+  background: var(--j-accent);
+  box-shadow: 0 0 0 5px var(--j-bg), 0 0 18px rgba(154, 247, 195, 0.26);
+}
+
+@media (max-width: 820px) {
+  .year-chapter {
+    grid-template-columns: 170px minmax(0, 1fr);
+    padding-bottom: 92px;
+  }
+
+  .year-chapter:not(:last-child) .year-records::after {
+    bottom: -92px;
+    height: 92px;
+  }
+
+  .year-anchor { padding-right: 30px; }
+
+  .year-records { padding-left: 39px; }
+
+  .year-record::before { left: -45px; }
+  .year-record::after {
+    left: -39px;
+    width: 39px;
+  }
+}
+
+@media (max-width: 560px) {
+  .chapter-timeline { border-top: 0; }
+
+  .year-chapter {
+    display: block;
+    padding: 0 0 74px;
+  }
+
+  .year-chapter:last-child { padding-bottom: 0; }
+
+  .year-anchor {
+    position: static;
+    padding: 0 0 24px 34px;
+  }
+
+  .year-number {
+    margin-bottom: 10px;
+    font-size: clamp(3.3rem, 15vw, 4.6rem);
+  }
+
+  .year-records {
+    padding-left: 34px;
+  }
+
+  .year-chapter:not(:last-child) .year-records::after {
+    bottom: -74px;
+    height: 74px;
+  }
+
+  .year-record {
+    padding-bottom: 43px;
+  }
+
+  .year-record::before {
+    top: 4px;
+    left: -40px;
+  }
+
+  .year-record::after {
+    top: 9px;
+    left: -34px;
+    width: 34px;
+  }
+
+  .record-meta {
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 0.58rem;
+    letter-spacing: 0.055em;
+  }
+
+  .year-record h3 { font-size: 1.33rem; }
+
+  .year-record > p:last-child {
+    font-size: 0.87rem;
+    line-height: 1.62;
+  }
+
+  .year-chapter.is-now .year-records::after { bottom: -55px; }
+}
