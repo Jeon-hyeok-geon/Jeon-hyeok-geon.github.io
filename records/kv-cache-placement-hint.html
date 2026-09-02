@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="2026 개척학기제 연구 기록. LLM/VLA KV Cache Offloading을 위한 시간 지역성 기반 SSD Placement Hint Middleware 설계.">
+  <title>KV Cache Placement Hint Middleware | 전혁건 포트폴리오</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="../journey.css?v=8">
+</head>
+<body class="journey-body research-body">
+  <a class="research-skip" href="#research-question">연구 내용으로 건너뛰기</a>
+  <div class="journey-shell">
+    <header class="journey-header">
+      <a class="journey-brand" href="../">전혁건<span>/</span><small>PORTFOLIO</small></a>
+      <nav class="journey-nav" aria-label="주요 탐색">
+        <a href="../">홈</a>
+        <a class="is-active" href="../archive.html#timeline">발자취</a>
+        <a href="../archive.html#fields">분야별 기록</a>
+      </nav>
+      <a class="journey-external" href="https://github.com/Jeon-hyeok-geon" target="_blank" rel="noreferrer">GitHub <span>↗</span></a>
+    </header>
+
+    <main class="research-detail">
+      <nav class="research-breadcrumb" aria-label="현재 위치">
+        <a href="../archive.html#timeline">← BACK TO ARCHIVE</a>
+        <span aria-hidden="true">/</span>
+        <span>RESEARCH / 2026</span>
+      </nav>
+
+      <header class="research-hero">
+        <p class="journey-eyebrow">PERSONAL ARCHIVE / SYSTEMS RESEARCH</p>
+        <p class="research-period">2026 · EXPLORATION SEMESTER</p>
+        <h1>KV Cache가 SSD로 내려간 뒤,<br>다시 읽히는 방식까지<br>생각해보기.</h1>
+        <p class="research-official-title">LLM/VLA KV Cache Offloading을 위한<br>시간 지역성 기반 SSD Placement Hint Middleware 설계</p>
+        <p class="research-summary">GPU와 DRAM에 모두 유지하기 어려운 KV Cache를 SSD로 offloading할 때, 문제는 단순히 어디에 저장할 것인가에서 끝나지 않습니다. 이 연구는 다시 함께 읽힐 가능성이 높은 KV Cache를 묶어 배치하도록 storage에 의도를 전달하는 방법을 살펴봅니다.</p>
+      </header>
+
+      <dl class="research-meta">
+        <div><dt>PERIOD</dt><dd>SEP — DEC 2026</dd></div>
+        <div><dt>TYPE</dt><dd>Exploration Semester<br>Systems Research</dd></div>
+        <div><dt>FOCUS</dt><dd>KV Cache · Storage I/O<br>Temporal Locality</dd></div>
+        <div><dt>STATUS</dt><dd>Planning &amp; Early Research</dd></div>
+      </dl>
+
+      <section class="research-question" id="research-question" aria-labelledby="question-title">
+        <p>RESEARCH QUESTION</p>
+        <h2 id="question-title">비슷한 시점에 다시 읽힐 KV Cache를<br>처음부터 가까운 그룹으로 묶어 둘 수 있다면,<br>restore I/O도 덜 흩어질까?</h2>
+      </section>
+
+      <article class="research-story">
+        <section class="research-section" aria-labelledby="why-title">
+          <header class="research-section-heading">
+            <p class="research-index">01</p>
+            <div>
+              <p class="research-label">WHY THIS PROJECT</p>
+              <h2 id="why-title">KV Cache는 점점 커지고,<br>모든 것을 GPU에 둘 수는 없습니다.</h2>
+              <p class="research-lead">LLM, VLM, VLA는 추론 중 이전 계산 결과를 재사용하기 위해 KV Cache를 계속 생성합니다. 긴 문맥, 여러 요청, prefix reuse가 늘어날수록 cache도 빠르게 커집니다. GPU memory와 DRAM이 제한적인 edge device, embedded board, robot 같은 환경에서는 일부 cache를 storage hierarchy로 내려보내는 선택이 필요해집니다.</p>
+            </div>
+          </header>
+          <figure class="memory-flow" aria-labelledby="memory-flow-caption">
+            <div class="memory-level"><span>01</span><strong>GPU MEMORY</strong><small>active KV Cache</small></div>
+            <div class="memory-connector"><span>memory pressure</span><i aria-hidden="true">↓</i></div>
+            <div class="memory-level"><span>02</span><strong>CPU MEMORY</strong><small>offload buffer</small></div>
+            <div class="memory-connector"><span>offload</span><i aria-hidden="true">↓</i></div>
+            <div class="memory-level"><span>03</span><strong>SSD / STORAGE</strong><small>offloaded KV Cache</small></div>
+            <div class="memory-return"><span>restore</span><i aria-hidden="true">↑</i><strong>INFERENCE</strong></div>
+            <figcaption id="memory-flow-caption">Conceptual storage hierarchy for KV Cache offloading.</figcaption>
+          </figure>
+        </section>
+
+        <section class="research-section" aria-labelledby="problem-title">
+          <header class="research-section-heading">
+            <p class="research-index">02</p>
+            <div>
+              <p class="research-label">THE STORAGE PROBLEM</p>
+              <h2 id="problem-title">저장은 순서대로 했는데,<br>다시 읽는 순서는 순서대로가 아닐 수 있습니다.</h2>
+              <p class="research-lead">KV Cache block마다 request, layer, token block, prefix reuse, 생성 시점과 최근 참조 시점이 다릅니다. 생성 순서만 기준으로 기록하면 나중에 함께 restore될 block들이 논리 주소 공간에서 떨어져 있을 수 있습니다. 이 연구는 그때 small random I/O나 fragmented I/O 같은 접근 패턴이 나타날 가능성을 검토하는 문제 가설에서 출발합니다.</p>
+            </div>
+          </header>
+          <figure class="pattern-figure" aria-labelledby="pattern-caption">
+            <div class="pattern-row">
+              <span class="pattern-label">GENERATION ORDER</span>
+              <div class="pattern-blocks" aria-label="생성 순서 예시">
+                <b class="class-a">A1</b><b class="class-b">B1</b><b class="class-c">C1</b><b class="class-a">A2</b><b class="class-c">C2</b><b class="class-b">B2</b><b class="class-a">A3</b>
+              </div>
+            </div>
+            <div class="pattern-row pattern-restore">
+              <span class="pattern-label">RESTORE ORDER</span>
+              <div class="restore-path"><b class="class-a">A1</b><i aria-hidden="true">→</i><b class="class-a">A2</b><i aria-hidden="true">→</i><b class="class-a">A3</b></div>
+              <span class="pattern-note">same class, separated placement</span>
+            </div>
+            <div class="pattern-row pattern-result">
+              <span class="pattern-label">LOGICAL READ</span>
+              <p><i aria-hidden="true">↘</i> scattered read <i aria-hidden="true">↗</i> address movement may increase</p>
+            </div>
+            <figcaption id="pattern-caption">Illustrative logical placement concept — not a representation of physical SSD addresses.</figcaption>
+          </figure>
+        </section>
+
+        <section class="research-section research-context" aria-labelledby="context-title">
+          <header class="research-section-heading">
+            <p class="research-index">03</p>
+            <div>
+              <p class="research-label">EXISTING CONTEXT</p>
+              <h2 id="context-title">Offloading의 흐름 위에서,<br>배치의 질문을 더해 봅니다.</h2>
+              <p class="research-lead">기존 연구와 시스템은 KV Cache를 동적으로 관리하거나 GPU·CPU·storage를 함께 쓰는 방법을 다뤄 왔습니다. 이 기록은 그 흐름을 출발점으로 삼되, 특정 framework 전체를 수정하거나 FDP를 직접 구현하는 범위까지 확장하지 않습니다.</p>
+            </div>
+          </header>
+          <div class="context-strip" aria-label="관련 연구와 개념">
+            <section><p>PAGEDATTENTION</p><h3>Dynamic KV Cache Management</h3><span>vLLM context</span></section>
+            <section><p>FLEXGEN</p><h3>GPU · CPU · Disk Offloading</h3><span>memory hierarchy context</span></section>
+            <section><p>LMCACHE · KVSWAP · SOLIDATTENTION</p><h3>Storage-backed KV Cache</h3><span>offloading context</span></section>
+            <section><p>FDP</p><h3>Host-guided Placement Concept</h3><span>conceptual reference only</span></section>
+          </div>
+          <p class="research-gap">Offloading 자체보다, <strong>어떤 KV Cache를 함께 놓을 것인가</strong>에 질문을 둡니다. 기존 시스템이 cache를 어디까지 내릴 수 있는지를 다룬다면, 이번 프로젝트에서는 offloaded KV Cache의 재사용 특성을 이용해 storage에 placement intention을 전달할 수 있는지를 살펴봅니다.</p>
+        </section>
+
+        <section class="research-section" aria-labelledby="idea-title">
+          <header class="research-section-heading">
+            <p class="research-index">04</p>
+            <div>
+              <p class="research-label">THE IDEA</p>
+              <h2 id="idea-title">KV Cache Metadata<br>→ Class<br>→ Placement Hint</h2>
+              <p class="research-lead">이 프로젝트는 KV Cache tensor 자체를 분석하지 않습니다. 작은 metadata trace를 입력으로 받아 비슷한 재사용 특성을 가진 block을 class로 분류하고, 그 class를 storage placement hint로 변환하는 정책을 설계합니다.</p>
+            </div>
+          </header>
+          <div class="trace-sample" aria-label="수집할 metadata trace 예시">
+            <div class="trace-sample-head"><span>METADATA-ONLY TRACE</span><small>planned input format</small></div>
+            <div class="trace-grid">
+              <span>request_id</span><span>layer_id</span><span>token_block_id</span><span>gen_time</span><span>ref_time</span><span>block_size</span><span>prefix_id</span><span>event</span>
+            </div>
+            <div class="trace-events"><span>EVENT</span><b>store</b><b>load</b><b>reuse</b><b>evict</b></div>
+          </div>
+          <div class="class-examples" aria-label="class 분류 예시">
+            <section><p>CLASS A</p><strong>HOT / SOON</strong><span>near-term reuse</span></section>
+            <section><p>CLASS B</p><strong>WARM / LATER</strong><span>intermediate reuse</span></section>
+            <section><p>CLASS C</p><strong>COLD / DISTANT</strong><span>longer interval</span></section>
+          </div>
+          <p class="research-caption">Illustrative classification — final policy will be evaluated during the project.</p>
+        </section>
+
+        <section class="research-section" aria-labelledby="system-title">
+          <header class="research-section-heading">
+            <p class="research-index">05</p>
+            <div>
+              <p class="research-label">PROPOSED FLOW</p>
+              <h2 id="system-title">Middleware는 storage를 직접 제어하지 않고,<br>함께 놓을 data의 의도를 전달합니다.</h2>
+              <p class="research-lead">구현 범위는 LLM/VLA inference framework의 KV Cache manager와 storage 계층 사이입니다. storage 내부 물리 위치를 지정하는 대신, 같은 class의 block이 같은 write stream, logical segment, 또는 placement group에 기록된다고 가정해 logical I/O pattern의 변화를 분석합니다.</p>
+            </div>
+          </header>
+          <figure class="architecture-figure" aria-labelledby="architecture-caption">
+            <div class="architecture-top">
+              <div class="architecture-source"><span>LLM / VLA INFERENCE</span><i aria-hidden="true">↓</i><strong>KV CACHE MANAGER</strong></div>
+            </div>
+            <div class="architecture-flow">
+              <div class="architecture-node"><span>01</span><strong>TRACE<br>COLLECTOR</strong><small>metadata</small></div>
+              <div class="architecture-node"><span>02</span><strong>KV<br>CLASSIFIER</strong><small>temporal locality<br>reuse · relation</small></div>
+              <div class="architecture-node"><span>03</span><strong>HINT<br>GENERATOR</strong><small>class → hint</small></div>
+              <div class="architecture-node"><span>04</span><strong>STORAGE<br>INTERFACE</strong><small>write stream</small></div>
+              <div class="architecture-node"><span>05</span><strong>LOGICAL<br>GROUP</strong><small>placement group</small></div>
+            </div>
+            <div class="architecture-bottom"><div><span>RESTORE / READ</span><strong>LOGICAL I/O PATTERN ANALYSIS</strong></div></div>
+            <figcaption id="architecture-caption">Application-level concept. The design does not specify physical SSD placement or modify firmware / FTL behavior.</figcaption>
+          </figure>
+        </section>
+
+        <section class="research-section" aria-labelledby="evaluation-title">
+          <header class="research-section-heading">
+            <p class="research-index">06</p>
+            <div>
+              <p class="research-label">HOW I PLAN TO TEST IT</p>
+              <h2 id="evaluation-title">작은 실제 trace에서<br>정책별 logical I/O를 비교합니다.</h2>
+              <p class="research-lead">소규모 LLM 실행에서 일반 prompt, prefix reuse, multi-turn dialogue, batch request의 metadata trace를 수집하고, 여러 배치 정책을 같은 기준에서 비교합니다. 이 단계의 평가는 실제 SSD latency의 절대 개선을 증명하는 대신 host 관점에서 보이는 logical I/O pattern을 확인하는 데 초점을 둡니다.</p>
+            </div>
+          </header>
+          <div class="evaluation-matrix" aria-label="예정된 workload, baseline, metric">
+            <section><p>WORKLOAD</p><ul><li>Normal Prompt</li><li>Prefix Reuse</li><li>Multi-turn Dialogue</li><li>Batch Request</li></ul></section>
+            <section><p>BASELINES</p><ul><li>Generation-order</li><li>Random Class</li><li>Request-local</li><li>Recentness-based</li><li>Temporal Locality-based</li></ul></section>
+            <section><p>REFERENCE INFORMATION</p><ul><li>Heuristic</li><li>Oracle</li><li>Noisy Prediction</li></ul></section>
+            <section><p>PRIMARY METRICS</p><ul><li>I/O Request Count</li><li>Average Address Movement</li><li>Segment Movement Count</li><li>Sequential-like Access Ratio</li></ul></section>
+            <section><p>SECONDARY</p><ul><li>Metadata Overhead</li><li>Hint Table Size</li><li>Classification Overhead</li><li>Estimated Placement Cost</li></ul></section>
+          </div>
+          <div class="prediction-notes">
+            <section><p>HEURISTIC</p><span>현재까지 관찰 가능한 정보만 사용합니다.</span></section>
+            <section><p>ORACLE</p><span>실제 미래 참조 정보를 안다고 가정한 상한선입니다.</span></section>
+            <section><p>NOISY</p><span>oracle에 예측 오차를 더한 조건입니다.</span></section>
+          </div>
+          <p class="research-caption">이를 통해 “hint가 효과가 있는가”뿐 아니라, 참조 시점을 어느 정도 알아야 의미 있는 차이가 생기는지도 함께 살펴봅니다.</p>
+        </section>
+
+        <section class="research-section" aria-labelledby="scope-title">
+          <header class="research-section-heading">
+            <p class="research-index">07</p>
+            <div>
+              <p class="research-label">SCOPE</p>
+              <h2 id="scope-title">이번 프로젝트가 하는 것,<br>그리고 하지 않는 것.</h2>
+              <p class="research-lead">한 학기 안에서 검증 가능한 질문으로 범위를 제한합니다. 연구의 결론도 이 범위를 넘어서지 않도록 설계합니다.</p>
+            </div>
+          </header>
+          <div class="scope-grid">
+            <section><p>THIS PROJECT</p><ul><li>소규모 LLM metadata trace 수집</li><li>KV Cache class 정책 설계</li><li>placement hint abstraction</li><li>application-level middleware 설계</li><li>logical I/O pattern 비교</li></ul></section>
+            <section><p>NOT THIS PROJECT</p><ul><li>SSD firmware 구현</li><li>FTL 수정</li><li>NAND physical address 직접 제어</li><li>대규모 production framework 수정</li><li>실제 SSD 제품 성능 개선 증명</li></ul></section>
+          </div>
+        </section>
+
+        <section class="research-section research-deliverable" aria-labelledby="output-title">
+          <header class="research-section-heading">
+            <p class="research-index">08</p>
+            <div>
+              <p class="research-label">CENTRAL DELIVERABLE</p>
+              <h2 id="output-title">KV Cache metadata를 입력받아<br>재사용 특성별 class와 placement hint를 생성하는<br>application-level middleware 설계.</h2>
+            </div>
+          </header>
+          <ol class="deliverable-list">
+            <li><span>01</span>KV Cache Workload Metadata Trace</li>
+            <li><span>02</span>KV Cache Classification Policy</li>
+            <li><span>03</span>Class-based Placement Hint Model</li>
+            <li><span>04</span>Middleware Input / Process / Output Design</li>
+            <li><span>05</span>Logical I/O Pattern Evaluation</li>
+            <li><span>06</span>Final Report / Presentation</li>
+          </ol>
+          <div class="generality-note"><p>WHAT THIS COULD GENERALIZE TO</p><span>시간 지역성, reuse, request relation 같은 metadata 기반 분류 구조는 특정 LLM 하나에만 묶이지 않는 방향을 목표로 합니다. 다만 이번 단계의 검토 범위는 small-scale LLM, limited workload, host-visible logical I/O에 한정됩니다. 여러 framework나 실제 FDP SSD에서의 일반성이 이미 증명된 것은 아닙니다.</span></div>
+        </section>
+
+        <section class="research-section" aria-labelledby="roadmap-title">
+          <header class="research-section-heading">
+            <p class="research-index">09</p>
+            <div>
+              <p class="research-label">SEMESTER ROADMAP</p>
+              <h2 id="roadmap-title">September에서 December까지,<br>질문을 trace와 설계로 좁혀 갑니다.</h2>
+              <p class="research-lead">신청서의 15주 일정을 연구의 흐름으로 다시 묶었습니다. 현재 상태는 결과 단계가 아닌 Planning &amp; Early Research입니다.</p>
+            </div>
+          </header>
+          <div class="roadmap-grid" aria-label="2026년 9월부터 12월까지 연구 일정">
+            <section><p>SEP</p><span>01 / DEFINE</span><strong>Problem Definition<br>Related Work<br>Trace Environment</strong><small>W01 — W04</small></section>
+            <section><p>OCT</p><span>02 / OBSERVE</span><strong>Prompt Workloads<br>Metadata Trace<br>Classification Policy</strong><small>W05 — W08</small></section>
+            <section><p>NOV</p><span>03 / BUILD &amp; TEST</span><strong>Middleware Design<br>Baselines<br>Metrics &amp; Experiments</strong><small>W09 — W13</small></section>
+            <section><p>DEC</p><span>04 / ANALYZE</span><strong>Prediction Accuracy<br>Result Analysis<br>Final Report</strong><small>W14 — W15</small></section>
+          </div>
+          <div class="current-focus"><p>AT THIS STAGE</p><span>Scope definition</span><span>Related work review</span><span>Trace design</span></div>
+        </section>
+
+        <section class="research-log" aria-labelledby="log-title">
+          <p>RESEARCH LOG</p>
+          <h2 id="log-title">이 기록은 계획에서 시작해<br>trace, experiment, reflection으로 이어질 예정입니다.</h2>
+          <span>This record will grow as the project moves from planning → trace collection → experiments → reflection.</span>
+        </section>
+      </article>
+
+      <section class="research-next" aria-label="다음 연구 방향">
+        <p>NEXT</p>
+        <div><span>Small-scale Trace</span><i aria-hidden="true">→</i><span>Middleware Policy</span><i aria-hidden="true">→</i><span>Logical I/O Analysis</span><i aria-hidden="true">→</i><span>Real Storage Validation</span></div>
+        <p>이번 학기에는 작은 trace와 logical I/O부터 시작합니다. 여기서 의미 있는 패턴이 보인다면, 다음 질문은 실제 inference framework와 SSD에서 이어질 수 있습니다.</p>
+      </section>
+
+      <nav class="detail-next" aria-label="관련 기록">
+        <a href="../archive.html#timeline"><span>BACK TO RESEARCH ARCHIVE</span><strong>2026년 Timeline으로 돌아가기 <i>→</i></strong></a>
+        <a href="../archive.html#research"><span>BY AREA</span><strong>연구와 탐구의 다른 기록 보기 <i>↗</i></strong></a>
+      </nav>
+    </main>
+
+    <footer class="journey-footer">
+      <p>© Hyeokgeon Jeon</p>
+      <div>
+        <a href="https://github.com/Jeon-hyeok-geon" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/hyeokgeon-jeon-81b038379/" target="_blank" rel="noreferrer">LinkedIn</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
